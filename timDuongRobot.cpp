@@ -179,7 +179,6 @@ public:
         init();
         Try(startRow, startCol);
         output();
-        ~
     }
 };
 
