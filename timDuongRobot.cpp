@@ -1,5 +1,5 @@
 #include <iostream>
-#include <fstream>
+#include <ctime>
 #include <vector>
 #define MAX 20
 class TimDuongRobot
@@ -11,32 +11,32 @@ private:
     std::vector<int> possiblePath, bestPath;
 
 public:
-    void inputFile(void)
+    void init(void)
     {
-        std::fstream readfile("input.txt", std::ios::in);
-        readfile >> row;
-        readfile >> col;
+        srand(time(NULL));
+        row = rand() % 8 + 3;
+        col = rand() % 8 + 3;
+
         for (int i = 0; i < row; i++)
             for (int j = 0; j < col; j++)
             {
-                readfile >> matrix[i][j];
+                int randomBlock = rand() % 2;
+                if (randomBlock == 1)
+                    matrix[i][j] = rand() % 101;
+                else
+                    matrix[i][j] = 0;
             }
-        readfile.close();
-    }
 
-    void init(void)
-    {
-        inputFile();
         while (true)
         {
-            system("cls");
-            std::cout << "Nhap vi tri khoi dau cua robot (row, col): ";
-            std::cin >> startRow >> startCol;
-            if (startRow <= row - 1 || startCol <= col - 1)
-            {
+            startRow = rand() % row;
+            startCol = rand() % col;
+            if (matrix[startRow][startCol] != 0)
                 break;
-            }
         }
+        std::cout << "Vi tri khoi dau cua robot (row, col): ("
+                  << startRow << ", " << startCol << ")\n";
+
         for (int i = 0; i < row; i++)
         {
             for (int j = 0; j < col; j++)
@@ -48,21 +48,22 @@ public:
         maxValue = 0;
     }
 
-    void outputFile(void)
+    void output(void)
     {
-        std::fstream writefile("output.txt", std::ios::out);
-        if (!writefile.is_open())
+        for (int i = 0; i < row; i++)
         {
-            std::cout << "\nERROR: Could not write file!\n";
-            return;
+            for (int j = 0; j < col; j++)
+            {
+                std::cout << matrix[i][j] << " ";
+            }
+            std::cout << "\n";
         }
+        std::cout << "\n";
         for (auto items : bestPath)
         {
-            writefile << items << " ";
+            std::cout << items << " ";
         }
-        writefile << "\nMax value: " << maxValue;
-        writefile.close();
-        std::cout << "INFO: Write file finished\nMax path value is " << maxValue << std::endl;
+        std::cout << "\nMax value: " << maxValue;
     }
 
     bool isMoveable(int i, int j)
@@ -175,7 +176,10 @@ public:
 
     void execute(void)
     {
+        init();
         Try(startRow, startCol);
+        output();
+        ~
     }
 };
 
@@ -184,8 +188,6 @@ int TimDuongRobot::countRecursive = 0;
 int main()
 {
     TimDuongRobot robot;
-    robot.init();
     robot.execute();
-    robot.outputFile();
     return 0;
 }
