@@ -2,6 +2,11 @@
 #include <ctime>
 #include <vector>
 #define MAX 20
+#define NONE 0
+#define DOWN 1
+#define LEFT 2
+#define RIGHT 3
+#define UP 4
 class TimDuongRobot
 {
 private:
@@ -66,109 +71,100 @@ public:
         std::cout << "\nMax value: " << maxValue;
     }
 
-    bool isMoveable(int i, int j)
+    int isMoveable(int startRow, int startCol)
     {
 
         // Down
-        if (flag[i + 1][j] == 0 && matrix[i + 1][j] != 0 && i + 1 < row)
+        if (startRow + 1 < row && flag[startRow + 1][startCol] == 0 && matrix[startRow + 1][startCol] != 0)
         {
-            return true;
+            return DOWN;
         }
         // Left
-        if (flag[i][j - 1] == 0 && matrix[i][j - 1] != 0 && j - 1 >= 0)
+        if (startCol - 1 >= 0 && flag[startRow][startCol - 1] == 0 && matrix[startRow][startCol - 1] != 0)
         {
-            return true;
+            return LEFT;
         }
         // Right
-        if (flag[i][j + 1] == 0 && matrix[i][j + 1] != 0 && j + 1 < col)
+        if (startCol + 1 < col && flag[startRow][startCol + 1] == 0 && matrix[startRow][startCol + 1] != 0)
         {
-            return true;
+            return RIGHT;
         }
         // Up
-        if (flag[i - 1][j] == 0 && matrix[i - 1][j] != 0 && i - 1 >= 0)
+        if (startRow - 1 >= 0 && flag[startRow - 1][startCol] == 0 && matrix[startRow - 1][startCol] != 0)
         {
-            return true;
+            return UP;
         }
-        return false;
+        return NONE;
     }
 
     void Try(int startRow, int startCol)
     {
-        for (int i = startRow; i < row; i++)
+        if (flag[startRow][startCol] == 1)
         {
-            for (int j = startCol; j < col; j++)
+            return;
+        }
+        if (matrix[startRow][startCol] == 0)
+        {
+            flag[startRow][startCol] = 1;
+            return;
+        }
+        else // Can go from here
+        {
+            if (isMoveable(startRow, startCol) != NONE)
             {
-                if (flag[i][j] == 1)
+                currentValue += matrix[startRow][startCol];
+                flag[startRow][startCol] = 1;
+                possiblePath.push_back(matrix[startRow][startCol]);
+                // Down
+                if (isMoveable(startRow, startCol) == DOWN)
                 {
-                    // currentValue = 0;
-                    continue;
+                    countRecursive++;
+                    Try(startRow + 1, startCol);
                 }
-                if (matrix[i][j] == 0)
+                // Left
+                if (isMoveable(startRow, startCol) == LEFT)
                 {
-                    flag[i][j] = 1;
-                    continue;
+                    countRecursive++;
+                    Try(startRow, startCol - 1);
                 }
-                else // Move-able
+                // Right
+                if (isMoveable(startRow, startCol) == RIGHT)
                 {
-                    if (isMoveable(i, j))
-                    {
-                        currentValue += matrix[i][j];
-                        flag[i][j] = 1;
-                        possiblePath.push_back(matrix[i][j]);
-                        // Down
-                        if (flag[i + 1][j] == 0 && matrix[i + 1][j] != 0 && i + 1 < row)
-                        {
+                    countRecursive++;
+                    Try(startRow, startCol + 1);
+                }
+                // Up
+                if (isMoveable(startRow, startCol) == UP)
+                {
+                    countRecursive++;
+                    Try(startRow - 1, startCol);
+                }
+                if (countRecursive != 0)
+                {
+                    countRecursive--;
+                    currentValue -= matrix[startRow][startCol];
+                    possiblePath.pop_back();
+                    return;
+                }
+            }
+            else
+            {
+                currentValue += matrix[startRow][startCol];
+                flag[startRow][startCol] = 1;
+                possiblePath.push_back(matrix[startRow][startCol]);
 
-                            countRecursive++;
-                            Try(i + 1, j);
-                        }
-                        // Left
-                        if (flag[i][j - 1] == 0 && matrix[i][j - 1] != 0 && j - 1 >= 0)
-                        {
-                            countRecursive++;
-                            Try(i, j - 1);
-                        }
-                        // Right
-                        if (flag[i][j + 1] == 0 && matrix[i][j + 1] != 0 && j + 1 < col)
-                        {
-                            countRecursive++;
-                            Try(i, j + 1);
-                        }
-                        // Up
-                        if (flag[i - 1][j] == 0 && matrix[i - 1][j] != 0 && i - 1 >= 0)
-                        {
-                            countRecursive++;
-                            Try(i - 1, j);
-                        }
-                        if (countRecursive != 0)
-                        {
-                            countRecursive--;
-                            currentValue -= matrix[i][j];
-                            possiblePath.pop_back();
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        currentValue += matrix[i][j];
-                        flag[i][j] = 1;
-                        possiblePath.push_back(matrix[i][j]);
-
-                        if (currentValue > maxValue)
-                        {
-                            maxValue = currentValue;
-                            bestPath.clear();
-                            bestPath = possiblePath;
-                        }
-                        if (countRecursive != 0)
-                        {
-                            countRecursive--;
-                            currentValue -= matrix[i][j];
-                            possiblePath.pop_back();
-                            return;
-                        }
-                        continue;
-                    }
+                if (currentValue > maxValue)
+                {
+                    maxValue = currentValue;
+                    bestPath.clear();
+                    bestPath = possiblePath;
+                }
+                if (countRecursive != 0)
+                {
+                    countRecursive--;
+                    currentValue -= matrix[startRow][startCol];
+                    possiblePath.pop_back();
+                    return;
                 }
             }
         }
