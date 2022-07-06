@@ -9,7 +9,7 @@ This project app is written in C# Windows Forms.
 
 The algorithm used by this project is [Brute-force search](https://en.wikipedia.org/wiki/Brute-force_search).
 
-Time complexity is `O($2^n$)`
+Time complexity is O($2^n$)
 
 ### **Gameplay**
 
@@ -19,7 +19,7 @@ Note: *Because of the Brute-force search algorithm, the player cannot win the ro
 
 ### **Picture**
 
-<img src="./pictures/gameplay-gameplay-1.png" width="100%"/>
+<img src="./pictures/gameplay-1.png" width="100%"/>
 
 ### **Recommendations for further project development**
 
